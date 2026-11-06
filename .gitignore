@@ -1,0 +1,4 @@
+.env
+repos/
+datos/semillas/verdad_*.json
+__pycache__/

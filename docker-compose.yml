@@ -1,0 +1,124 @@
+name: bria
+
+# Sistema completo en tu máquina: PostgreSQL, motor de pronóstico, API, web y datos de prueba.
+#
+#   1. preparar.ps1 (Windows) o preparar.sh (Linux/macOS)
+#   2. docker compose up --build
+#   3. http://localhost:3000
+#
+# Los valores salen de .env, que crea el paso 1. La guía está en README.md.
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-api-env: &api-env
+  APP_ENV: development
+  APP_DEBUG: "false"
+  DATABASE_URL: postgresql+psycopg://bria:${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD. Ejecuta preparar.ps1 o preparar.sh}@db:5432/bria
+  JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Falta JWT_SECRET_KEY. Ejecuta preparar.ps1 o preparar.sh}
+  CORS_ORIGINS: http://localhost:${WEB_PORT:-3000},http://127.0.0.1:${WEB_PORT:-3000}
+  FTGM_ENGINE_MODE: real
+  FTGM_ENGINE_BASE_URL: http://engine:8010/api/v1
+  FTGM_ENGINE_API_KEY: ${ENGINE_API_KEY:?Falta ENGINE_API_KEY. Ejecuta preparar.ps1 o preparar.sh}
+  FTGM_ENGINE_TIMEOUT_SECONDS: "180"
+  STORAGE_BACKEND: db
+  SEED_DEMO: "true"
+  DEMO_OWNER_PASSWORD: ${DEMO_OWNER_PASSWORD:?Falta DEMO_OWNER_PASSWORD. Ejecuta preparar.ps1 o preparar.sh}
+  DEMO_SELLER_PASSWORD: ${DEMO_SELLER_PASSWORD:?Falta DEMO_SELLER_PASSWORD. Ejecuta preparar.ps1 o preparar.sh}
+
+services:
+  db:
+    image: postgres:16
+    logging: *logging
+    environment:
+      POSTGRES_USER: bria
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD. Ejecuta preparar.ps1 o preparar.sh}
+      POSTGRES_DB: bria
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      # Solo desde esta máquina, para revisar la base con tu cliente de SQL.
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bria -d bria"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  engine:
+    build: ./repos/bria-engine
+    logging: *logging
+    environment:
+      APP_ENV: development
+      APP_DEBUG: "false"
+      PORT: "8010"
+      ENGINE_API_KEY: ${ENGINE_API_KEY:?Falta ENGINE_API_KEY. Ejecuta preparar.ps1 o preparar.sh}
+    ports:
+      - "${ENGINE_PORT:-8010}:8010"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8010/health', timeout=4)"]
+      interval: 10s
+      timeout: 6s
+      retries: 12
+      start_period: 20s
+
+  api:
+    build: ./repos/bria-api
+    image: bria-api:local
+    logging: *logging
+    depends_on:
+      db:
+        condition: service_healthy
+      engine:
+        condition: service_healthy
+    environment:
+      <<: *api-env
+      PORT: "8000"
+    ports:
+      - "${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=4)"]
+      interval: 10s
+      timeout: 6s
+      retries: 30
+      # El primer arranque migra la base y carga PetHouse Lima antes de responder.
+      start_period: 120s
+
+  # Carga PetHouse Miraflores una sola vez y termina. Mientras la empresa exista, no toca nada.
+  semilla:
+    build: ./repos/bria-api
+    image: bria-api:local
+    logging: *logging
+    restart: "no"
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      <<: *api-env
+      PYTHONPATH: /app
+      SEED_HOY: ${SEED_HOY:-}
+    command: ["python", "/datos/semillas/seed_pethouse_miraflores.py"]
+    volumes:
+      - ./datos/semillas:/datos/semillas
+
+  web:
+    build:
+      context: ./repos/bria-web
+      dockerfile: Dockerfile.prod
+      args:
+        # El navegador llama a la API desde tu máquina, y este valor se fija al compilar.
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:${API_PORT:-8000}/api/v1
+    logging: *logging
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      PORT: "3000"
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+
+volumes:
+  pgdata:

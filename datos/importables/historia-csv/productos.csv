@@ -1,0 +1,13 @@
+sku,name,category,unit_cost,unit_price,currency,unit_of_measure,lead_time_days,safety_stock,reorder_point
+SKU-001,Alimento Premium Perro 15kg,Alimento,85.00,129.90,PEN,unit,7,10,25
+SKU-002,Alimento Premium Gato 3kg,Alimento,28.00,45.90,PEN,unit,7,15,35
+SKU-003,Snack Natural Pollo Perro 200g,Alimento,8.50,14.90,PEN,unit,5,20,50
+SKU-004,Shampoo Medicado Perro 500ml,Higiene,12.00,22.90,PEN,unit,10,12,28
+SKU-005,Toallitas Húmedas Cachorros x50,Higiene,6.50,12.50,PEN,unit,6,18,40
+SKU-006,Arena para Gatos Aglomerante 5kg,Higiene,14.00,24.90,PEN,unit,8,14,30
+SKU-007,Antiparasitario Externo Perro,Salud,18.00,34.90,PEN,unit,14,8,20
+SKU-008,Vitaminas Articulaciones Perro Senior,Salud,32.00,59.90,PEN,unit,14,6,15
+SKU-009,Suplemento Omega 3 Gatos 100ml,Salud,22.00,42.90,PEN,unit,12,7,18
+SKU-010,Correa Retráctil 5m Perros Medianos,Accesorios,28.00,52.90,PEN,unit,10,5,12
+SKU-011,Cama Ortopédica Perro Mediano,Accesorios,55.00,99.90,PEN,unit,12,4,10
+SKU-012,Juguete Interactivo Dispensador Gato,Accesorios,15.00,28.90,PEN,unit,9,8,20
