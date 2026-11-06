@@ -23,6 +23,7 @@ Usa los mismos nombres en todas las plataformas, para reconocer cada pieza:
 | Motor de pronóstico | Railway | `bria-engine` | [bria-app/bria-engine](https://github.com/bria-app/bria-engine) |
 | API | Railway | `bria-api` | [bria-app/bria-api](https://github.com/bria-app/bria-api) |
 | Aplicación web | Vercel | `bria-web` | [bria-app/bria-web](https://github.com/bria-app/bria-web) |
+| Página pública | Vercel | `bria-app` | [bria-app/bria-landing](https://github.com/bria-app/bria-landing) |
 
 Las plataformas arman la dirección con esos nombres si está libre: por ejemplo, `bria-api-production.up.railway.app` y `bria-web.vercel.app`. La dirección final es la que muestra cada panel.
 
@@ -101,6 +102,11 @@ Hay un cambio frente a versiones anteriores: `bootstrap_demo.py` ya no trae cont
 4. Si la dirección final de la web es distinta a la que pusiste en `CORS_ORIGINS`, actualízala en la API.
 
 También puede ir en Railway: `bria-web` trae `railway.json` y `Dockerfile.prod`. Declara la misma variable antes del primer despliegue.
+
+## 5. Página pública
+
+1. En Vercel: **Add New › Project › `bria-landing`** y nombra el proyecto `bria-app`, porque la dirección `bria-landing.vercel.app` pertenece a otra empresa. No necesita variables si la web y la API usan las direcciones de producción.
+2. En el proyecto `bria-web`, define `NEXT_PUBLIC_LANDING_URL` con la dirección de la página y vuelve a desplegar. Así, el logo de la pantalla de entrada lleva a ella.
 
 ## Verificación final
 
