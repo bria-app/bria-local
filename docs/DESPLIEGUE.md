@@ -28,7 +28,7 @@ Las plataformas arman la dirección con esos nombres si está libre: por ejemplo
 
 ## Antes de empezar
 
-1. Autoriza a Railway y a Vercel a leer los repositorios de la organización `bria-app`: en cada plataforma, revisa el acceso de su aplicación de GitHub. En el plan gratuito de Vercel, el repositorio de una organización debe ser público para desplegarlo.
+1. Autoriza a Railway y a Vercel a leer los repositorios de la organización `bria-app`: en cada plataforma, revisa el acceso de su aplicación de GitHub. Los repositorios son privados y de una organización: según reportes de usuarios, para desplegar `bria-web` en Vercel hace falta el plan Pro. Railway se comprueba al desplegar.
 2. Genera dos secretos distintos, uno para la clave del motor y otro para las sesiones:
 
    ```bash
