@@ -10,7 +10,7 @@ foreach ($repo in @("bria-web", "bria-api", "bria-engine")) {
         Write-Host "repos/$repo ya existe"
     } else {
         git clone "https://github.com/$Organizacion/$repo.git" "repos/$repo"
-        if ($LASTEXITCODE -ne 0) { throw "No se pudo clonar $repo. Revisa que puedas abrir el repositorio en GitHub." }
+        if ($LASTEXITCODE -ne 0) { throw "No se pudo clonar $repo. Revisa Git y tu conexion." }
     }
 }
 

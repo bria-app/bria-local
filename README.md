@@ -148,7 +148,7 @@ docker compose down -v
 | Síntoma | Qué hacer |
 |---|---|
 | `Falta POSTGRES_PASSWORD` u otra variable | Ejecuta `preparar.ps1` o `preparar.sh` |
-| No se pudo clonar un repositorio | Revisa que puedas abrir sus enlaces en GitHub. Si no se abren, pide acceso e inicia sesión con esa cuenta, por ejemplo con `gh auth login` y `gh auth setup-git` |
+| No se pudo clonar un repositorio | Revisa que Git esté instalado, que tengas conexión y que puedas abrir sus enlaces en GitHub |
 | Un puerto ya está en uso | Cambia `WEB_PORT`, `API_PORT`, `ENGINE_PORT` o `DB_PORT` en `.env` y vuelve a ejecutar `docker compose up --build` |
 | La máquina se queda sin memoria al compilar | Compila de a uno: `docker compose build engine`, luego `api` y luego `web` |
 | No puedes entrar con la contraseña de `.env` | Se aplica solo al crear las cuentas. Si cambiaste `.env` después, ejecuta `docker compose down -v` y levanta de nuevo |
