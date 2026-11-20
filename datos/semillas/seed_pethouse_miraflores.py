@@ -311,6 +311,8 @@ def main() -> None:
         def who(dt: datetime):  # the owner sells mornings and weekend mornings; Carla the rest
             return owner if dt.weekday() >= 5 and dt.hour < 14 or dt.hour < 11 else seller
 
+        # The batch only marks the company as loaded. Its sales are till tickets, not an import, so
+        # their lines carry no batch: Ventas › «Historial importado» lists lines with a batch (CP040).
         batch = SalesBatchModel(company_id=company_id, source_file=TAG, status="completed", row_count=0)
         session.add(batch)
         session.flush()
@@ -527,7 +529,7 @@ def main() -> None:
                 orders.append(order)
                 for _, p, q, pr, c, _b in chunk:
                     sales.append(SaleModel(
-                        company_id=company_id, product_id=p.id, batch_id=batch.id, sale_date=d, quantity=q,
+                        company_id=company_id, product_id=p.id, batch_id=None, sale_date=d, quantity=q,
                         unit_price=pr, total_amount=money(q * pr), currency="PEN", unit_cost=c,
                         order_id=order.id, seller_id=user.id, seller_name=user.full_name or ""))
                     moves.append(InventoryMovementModel(
@@ -537,8 +539,7 @@ def main() -> None:
         session.add_all(orders)
         session.flush()
         session.add_all(sales + moves + purchases + lost)
-        batch.row_count = len(sales)
-        batch.period_start, batch.period_end = START, END
+        batch.row_count = 0  # no imported lines: see the note where the batch is created
         for n, o in enumerate(sorted(orders, key=lambda o: o.sold_at), start=1):
             o.order_number = -n
         session.flush()
